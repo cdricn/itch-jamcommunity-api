@@ -4,15 +4,14 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const app = express();
 
-let entries = []
-
 app.get('/', (req, res) => {
-  res.json('Hey hey hey!')
+  res.json('Welcome!');
 });
 
-app.get('/hey', (req, res) => {
+let entries = []
 
-  axios.get('https://itch.io/jams/starting-this-month/ranked/with-participants')
+app.get('/jams', (req, res) => {
+  axios.get('https://itch.io/jams/in-progress/ranked/with-participants')
     .then((response) => {
       const html = response.data;
       const $ = cheerio.load(html);
@@ -20,16 +19,24 @@ app.get('/hey', (req, res) => {
       $('.jam').each((_, element) => {
         const $element = $(element);
         const title = $element.text();
-        const url = $element.find('a').attr('href');
+        const url = 'https://itch.io' + $element.find('a').attr('href');
+        const members = $element.find('.number').text();
+        const deadline = $element.find('.date_countdown').text();
+        const host = $element.find('.hosted_by').text();
         
-        entries.push({title, url});
+        if (Number(members) >= 100) {
+          entries.push({title, url, members, deadline, host});
+        }
       });
 
       res.json(entries);
     }).catch((err) => {
       console.log(err);
-      res.status(500).json({ error: 'Failed to fetch or process data.' });
     })
+});
+
+app.get('/posts', (req, res) => {
+  res.json('Hey hey hey!')
 });
 
 app.listen(PORT, () => console.log(`server running on PORT ${PORT}`));
