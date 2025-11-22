@@ -1,14 +1,23 @@
+import express from 'express';
+import * as cheerio from 'cheerio';
+import axios from 'axios';
+
 const PORT = 8000;
-const express = require('express');
-const axios = require('axios');
-const cheerio = require('cheerio');
 const app = express();
 
-//app.get('/', (req, res) => {
-//  res.json('Welcome! Go to /jams to get the list of gamejams. Go to /posts to get the list of posts per gamejam.');
-//});
+app.get('/', (req, res) => {
+  res.json('Welcome! Go to /jams to get the list of gamejams. Go to /posts to get the list of posts per gamejam.');
+});
 
-let entries = []
+interface Entries {
+  title: string,
+  url: string,
+  members: string,
+  deadline: string,
+  host: string
+}
+
+let entries : Entries[] = []
 
 app.get('/jams', (req, res) => {
   axios.get('https://itch.io/jams/in-progress/ranked/with-participants')
@@ -43,6 +52,5 @@ app.get('/posts', (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`server running on PORT ${PORT}`));
-
 
 export default app;
