@@ -35,6 +35,7 @@ app.get('/jams', (req, res) => {
     })
 });
 
+
 app.get('/posts', (req, res) => {
   entries.forEach(entry => {
     axios.get(entry.url);
@@ -42,3 +43,6 @@ app.get('/posts', (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`server running on PORT ${PORT}`));
+
+
+export default app;
