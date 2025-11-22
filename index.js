@@ -4,9 +4,9 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const app = express();
 
-app.get('/', (req, res) => {
-  res.json('Welcome!');
-});
+//app.get('/', (req, res) => {
+//  res.json('Welcome! Go to /jams to get the list of gamejams. Go to /posts to get the list of posts per gamejam.');
+//});
 
 let entries = []
 
@@ -36,7 +36,9 @@ app.get('/jams', (req, res) => {
 });
 
 app.get('/posts', (req, res) => {
-  res.json('Hey hey hey!')
+  entries.forEach(entry => {
+    axios.get(entry.url);
+  })
 });
 
 app.listen(PORT, () => console.log(`server running on PORT ${PORT}`));
