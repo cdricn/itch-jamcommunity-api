@@ -33,7 +33,7 @@ app.get('/jams', (req, res) => {
         const deadline = $element.find('.date_countdown').text();
         const host = $element.find('.hosted_by').text();
         
-        if (Number(members) >= 100) {
+        if (Number(members) >= 300) {
           entries.push({title, url, members, deadline, host});
         }
       });
