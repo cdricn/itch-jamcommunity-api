@@ -12,7 +12,7 @@ app.get('/', (req, res) => {
 interface Entries {
   title: string,
   url: string,
-  members: string,
+  members: number,
   deadline: string,
   host: string
 }
@@ -27,13 +27,14 @@ app.get('/jams', (req, res) => {
 
       $('.jam').each((_, element) => {
         const $element = $(element);
-        const title = $element.text();
+        const title = $element.find('.primary_info').text();
         const url = 'https://itch.io' + $element.find('a').attr('href');
-        const members = $element.find('.number').text();
+        const members = Number($element.find('.stat').find('.number').first().text()); 
         const deadline = $element.find('.date_countdown').text();
         const host = $element.find('.hosted_by').text();
+        console.log('test', members)
         
-        if (Number(members) >= 300) {
+        if (members >= 300) {
           entries.push({title, url, members, deadline, host});
         }
       });
