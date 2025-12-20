@@ -30,7 +30,7 @@ app.get('/jams', (req, res) => {
         const url = 'https://itch.io' + $element.find('a').attr('href');
         const members = Number($element.find('.stat').find('.number').first().text()); 
         const deadline = $element.find('.date_countdown').text();
-        const host = $element.find('.hosted_by').text();
+        const host = $element.find('.hosted_by').text().slice(10);
         
         if (members >= 300) {
           entries.push({title, url, members, deadline, host});
