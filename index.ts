@@ -17,14 +17,13 @@ interface Entries {
   host: string
 }
 
-let entries : Entries[] = []
-
 app.get('/jams', (req, res) => {
   axios.get('https://itch.io/jams/in-progress/ranked/with-participants')
     .then((response) => {
+      let entries : Entries[] = [];
       const html = response.data;
       const $ = cheerio.load(html);
-
+ 
       $('.jam').each((_, element) => {
         const $element = $(element);
         const title = $element.find('.primary_info').text();
@@ -32,7 +31,6 @@ app.get('/jams', (req, res) => {
         const members = Number($element.find('.stat').find('.number').first().text()); 
         const deadline = $element.find('.date_countdown').text();
         const host = $element.find('.hosted_by').text();
-        console.log('test', members)
         
         if (members >= 300) {
           entries.push({title, url, members, deadline, host});
@@ -46,11 +44,11 @@ app.get('/jams', (req, res) => {
 });
 
 
-app.get('/posts', (req, res) => {
+/*app.get('/posts', (req, res) => {
   entries.forEach(entry => {
     axios.get(entry.url);
   })
-});
+});*/
 
 app.listen(PORT, () => console.log(`server running on PORT ${PORT}`));
 
