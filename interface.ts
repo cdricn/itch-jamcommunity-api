@@ -14,4 +14,5 @@ export interface Posts {
   replies: number,
   datePosted: string,
   author: string
+  tag: string;
 }

@@ -38,6 +38,9 @@ app.get('/jams', (req, res) => {
 });
 
 function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
+  const keywords = ["looking", "team", "teams", "need"]; 
+  const tags = ["artist", "musician", "composer", "programmer", "developer"];
+
   $('.topic_row').each((_, element) => {
     const $element = $(element);
     const title = $element.find('.topic_link').text();
@@ -47,48 +50,35 @@ function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
     const datePosted = $element.find('.topic_date').attr('title')!;
     const author = $element.find('.topic_author').text();
 
-    entries.push({title, url, preview, replies, datePosted, author});
+    if(keywords.some(word=>title.includes(word))) {
+      const tag = '';
+      entries.push({title, url, preview, replies, datePosted, author, tag});
+    }
   });
   return entries;
 }
 
-async function GoToNextPage(currentPageLink:string, entries:Posts[]) {
-  let newEntries = await axios.get(currentPageLink)
-    .then((response) => { 
-      const html = response.data;
-      const $ = cheerio.load(html);
-      const nextPageText = $('.category_pager').find('a').first().text();
-      const nextPageLink = 'https://itch.io' + $('.category_pager').find('a').attr('href');
+async function LoadPage(currentPageLink:string, entries:Posts[]) {
+  const response = await axios.get(currentPageLink);
+  const html = response.data;
+  const $ = cheerio.load(html);
 
-      GetPosts($, entries);
+  const nextPageText = $('.category_pager').find('a').first().text();
+  const nextPageLink = 'https://itch.io' + $('.category_pager').find('a').attr('href');
 
-      if (nextPageText==='Next page') {
-        GoToNextPage(nextPageLink, entries);
-      }
-    })
-  
-      console.log(newEntries);
+  const collectedEntries = GetPosts($, entries);
+  entries.concat(collectedEntries);
+
+  if (nextPageText==='Next page') {
+    entries.concat(await LoadPage(nextPageLink, entries));
+  }
+  return entries;
 }
 
 app.get('/posts/:jamLink', async (req, res) => {
   const jamLink = 'https://itch.io/jam/' + req.params.jamLink + '/community';
-  //let populatedEntries = CyclePages(jamLink, entries);
-
-  axios.get(jamLink)
-    .then((response) => { 
-      let entries : Posts[] = [];
-      const html = response.data;
-      const $ = cheerio.load(html);
-      const nextPageText = $('.category_pager').find('a').first().text();
-      const nextPageLink = 'https://itch.io' + $('.category_pager').find('a').attr('href');
-
-      entries = GetPosts($, entries);
-      if (nextPageText==='Next page') {
-        GoToNextPage(nextPageLink, entries);
-      }
-      
-      res.json(entries);
-    })
+  const entries : Posts[] = await LoadPage(jamLink, []);
+  res.json(entries);
 });
 
 app.listen(PORT, () => console.log(`server running on PORT ${PORT}`));
