@@ -39,7 +39,7 @@ app.get('/jams', (req, res) => {
 
 function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
   const keywords = ["looking", "team", "teams", "need"]; 
-  const tags = ["artist", "musician", "composer", "programmer", "developer"];
+  const tags = ["artist", "producer", "musician", "coder", "composer", "programmer", "developer"];
 
   $('.topic_row').each((_, element) => {
     const $element = $(element);
@@ -49,11 +49,17 @@ function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
     const replies = Number($element.find('.number_value').first().text());
     const datePosted = $element.find('.topic_date').attr('title')!;
     const author = $element.find('.topic_author').text();
+    let tag = 'generic';
 
     if(keywords.some(word=>title.includes(word))) {
-      const tag = '';
+      for(const item of tags) {
+        if(title.includes(item)){
+          tag = item;
+        } 
+      }
       entries.push({title, url, preview, replies, datePosted, author, tag});
     }
+    
   });
   return entries;
 }
