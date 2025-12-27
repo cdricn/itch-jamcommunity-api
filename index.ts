@@ -44,7 +44,7 @@ function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
   $('.topic_row').each((_, element) => {
     const $element = $(element);
     const title = $element.find('.topic_link').text();
-    const url = 'https://itch.io' + $element.find('a').attr('href');
+    const url = 'https://itch.io' + $element.find('.topic_title').find('a').attr('href');
     const preview = $element.find('.topic_preview').text();
     const replies = Number($element.find('.number_value').first().text());
     const datePosted = $element.find('.topic_date').attr('title')!;
