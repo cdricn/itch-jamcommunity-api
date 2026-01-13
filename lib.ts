@@ -3,7 +3,7 @@ import axios from 'axios';
 import type { Posts } from './interface';
 
 export function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
-  const keywords = ["looking", "team", "teams", "need"]; 
+  const keywords = ["looking", "team", "teams", "need", "group", "contribute"]; 
   const tags = ["artist", "producer", "musician", "coder", "composer", "programmer", "developer"];
 
   $('.topic_row').each((_, element) => {

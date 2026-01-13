@@ -3,15 +3,20 @@ import * as cheerio from 'cheerio';
 import axios from 'axios';
 import type { Entries, Posts } from './interface';
 import { LoadPage } from './lib.ts';
+import cors from 'cors';
 
 const PORT = 8000;
 const app = express();
 
-app.get('/', (req, res) => {
-  res.json('Welcome! Go to /jams to get the list of gamejams. Go to /posts to get the list of posts per gamejam.');
-});
+let corsOptions = {
+  origin: '*',
+  methods: ['GET', 'POST'],
+}
+
+app.use(cors(corsOptions))
 
 app.get('/jams', (req, res) => {
+  //res.setHeader('Access-Control-Allow-Origin', '*')
   axios.get('https://itch.io/jams/in-progress/ranked/with-participants')
     .then((response) => {
       let entries : Entries[] = [];
