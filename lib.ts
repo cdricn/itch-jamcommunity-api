@@ -10,7 +10,7 @@ export function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
     const $element = $(element);
     const title = $element.find('.topic_link').text();
     const url = 'https://itch.io' + $element.find('.topic_title').find('a').attr('href');
-    const preview = $element.find('.topic_preview').text();
+    const content = $element.find('.topic_preview').text();
     const replies = Number($element.find('.number_value').first().text());
     const datePosted = $element.find('.topic_date').attr('title')!;
     const author = $element.find('.topic_author').text();
@@ -22,7 +22,7 @@ export function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
           tag = item;
         } 
       }
-      entries.push({title, url, preview, replies, datePosted, author, tag});
+      entries.push({title, url, content, replies, datePosted, author, tag});
     }
     
   });
@@ -31,6 +31,11 @@ export function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
 
 export async function LoadPage(currentPageLink:string, entries:Posts[]) {
   const response = await axios.get(currentPageLink);
+
+  if(!response) {
+    return []; //probably bad; doesnt tell you if no result or app crashed
+  }
+
   const html = response.data;
   const $ = cheerio.load(html);
 

@@ -10,7 +10,7 @@ export interface Entries {
 export interface Posts {
   title: string,
   url: string,
-  preview: string,
+  content: string,
   replies: number,
   datePosted: string,
   author: string

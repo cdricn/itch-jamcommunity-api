@@ -4,6 +4,7 @@ import axios from 'axios';
 import type { Entries, Posts } from './interface';
 import { LoadPage } from './lib.ts';
 import cors from 'cors';
+// import testData from './test.json'
 
 const PORT = 8000;
 const app = express();
@@ -39,15 +40,20 @@ app.get('/jams', (req, res) => {
       res.json(entries);
 
     }).catch((err) => {
-      console.log(err);
+      console.log('Error fetching gamejams from itch.io.',err);
     })
 });
 
 app.get('/posts/:jamLink', async (req, res) => {
   const jamLink = 'https://itch.io/jam/' + req.params.jamLink + '/community';
-  const entries : Posts[] = await LoadPage(jamLink, []);
+  const entries : Posts[] | undefined = await LoadPage(jamLink, []);
   res.json(entries);
 });
+
+// In case connection can't be made; use test to to run app on test data, 
+/* app.get('/test', async (req, res) => {
+  return testData;
+}) */
 
 app.listen(PORT, () => console.log(`server running on PORT ${PORT}`));
 
