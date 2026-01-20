@@ -2,26 +2,15 @@ import express from 'express';
 import * as cheerio from 'cheerio';
 import axios from 'axios';
 import type { Entries, Posts } from './interface';
-import { LoadPage } from './lib';
-import cors from 'cors';
+import { LoadPage } from './lib.ts';
 // import testData from './test.json'
 
 const PORT = 8000;
 const app = express();
 
-let corsOptions = {
-  origin: '*',
-  methods: ['GET', 'POST'],
-}
-
-app.use(cors(corsOptions))
-
-app.get('/', (req, res) => {
-  res.json('Welcome! Go to /jams to get the list of gamejams. Go to /posts to get the list of posts per gamejam.');
-});
 
 app.get('/jams', (req, res) => {
-  //res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Origin', '*')
   axios.get('https://itch.io/jams/in-progress/ranked/with-participants')
     .then((response) => {
       let entries : Entries[] = [];
@@ -49,6 +38,7 @@ app.get('/jams', (req, res) => {
 });
 
 app.get('/posts/:jamLink', async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*')
   const jamLink = 'https://itch.io/jam/' + req.params.jamLink + '/community';
   const entries : Posts[] | undefined = await LoadPage(jamLink, []);
   res.json(entries);
