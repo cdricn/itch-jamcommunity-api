@@ -16,6 +16,10 @@ let corsOptions = {
 
 app.use(cors(corsOptions))
 
+app.get('/', (req, res) => {
+  res.json('Welcome! Go to /jams to get the list of gamejams. Go to /posts to get the list of posts per gamejam.');
+});
+
 app.get('/jams', (req, res) => {
   //res.setHeader('Access-Control-Allow-Origin', '*')
   axios.get('https://itch.io/jams/in-progress/ranked/with-participants')
