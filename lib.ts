@@ -30,23 +30,26 @@ export function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
 }
 
 export async function LoadPage(currentPageLink:string, entries:Posts[]) {
-  const response = await axios.get(currentPageLink);
+  try {
+    const response = await axios.get(currentPageLink);
 
-  if(!response) {
-    return []; //probably bad; doesnt tell you if no result or app crashed
+    const html = response.data;
+    const $ = cheerio.load(html);
+
+    const nextPageText = $('.category_pager').find('a').first().text();
+    const nextPageLink = 'https://itch.io' + $('.category_pager').find('a').attr('href');
+
+    const collectedEntries = GetPosts($, entries);
+    entries.concat(collectedEntries);
+
+    if (nextPageText==='Next page') {
+      const newEntries = await LoadPage(nextPageLink, entries);
+      if (newEntries) entries.concat();
+    }
+    return entries;
   }
-
-  const html = response.data;
-  const $ = cheerio.load(html);
-
-  const nextPageText = $('.category_pager').find('a').first().text();
-  const nextPageLink = 'https://itch.io' + $('.category_pager').find('a').attr('href');
-
-  const collectedEntries = GetPosts($, entries);
-  entries.concat(collectedEntries);
-
-  if (nextPageText==='Next page') {
-    entries.concat(await LoadPage(nextPageLink, entries));
-  }
-  return entries;
+  catch (e) {
+    console.log('Something went wrong.', e)
+    return undefined;
+  }  
 }
