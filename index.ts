@@ -2,7 +2,7 @@ import express from 'express';
 import * as cheerio from 'cheerio';
 import axios from 'axios';
 import type { Entries, Posts } from './interface';
-import { LoadPage } from './lib.js';
+import { LoadPage } from './lib.js'; //keep as .js in prod or else vercel will kill itself 
 // import testData from './test.json'
 
 const PORT = 8000;
