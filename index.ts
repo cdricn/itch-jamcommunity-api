@@ -2,7 +2,7 @@ import express from 'express';
 import * as cheerio from 'cheerio';
 import axios from 'axios';
 import type { Entries, Posts } from './interface';
-import { LoadPage } from './lib.ts';
+import { LoadPage } from './lib';
 import cors from 'cors';
 // import testData from './test.json'
 
@@ -58,5 +58,3 @@ app.get('/posts/:jamLink', async (req, res) => {
 app.listen(PORT, () => console.log(`server running on PORT ${PORT}`));
 
 export default app;
-
-//https://itch.io/jam/20-second-game-jam-2025/community

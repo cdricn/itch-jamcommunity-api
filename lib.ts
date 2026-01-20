@@ -49,7 +49,7 @@ export async function LoadPage(currentPageLink:string, entries:Posts[]) {
     return entries;
   }
   catch (e) {
-    console.log('Something went wrong.', e)
+    console.log('Something went wrong.', e);
     return undefined;
   }  
 }
