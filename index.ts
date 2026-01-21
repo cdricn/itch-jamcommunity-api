@@ -9,7 +9,7 @@ const PORT = 8000;
 const app = express();
 
 
-app.get('/jams', (req, res) => {
+app.get('/jams/:members', (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
   axios.get('https://itch.io/jams/in-progress/ranked/with-participants')
     .then((response) => {
@@ -25,7 +25,7 @@ app.get('/jams', (req, res) => {
         const deadline = $element.find('.date_countdown').text();
         const host = $element.find('.hosted_by').text().slice(10);
         
-        if (members >= 300) {
+        if (members >= Number(req.params.members)) {
           entries.push({title, url, members, deadline, host});
         }
       });
