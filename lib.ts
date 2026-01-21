@@ -11,15 +11,14 @@ export function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
 
   $('.topic_row').each((_, element) => {
     const $element = $(element);
-    const title = $element.find('.topic_link').text().toLowerCase();
+    const title = $element.find('.topic_link').text();
     const url = 'https://itch.io' + $element.find('.topic_title').find('a').attr('href');
     const content = $element.find('.topic_preview').text();
     const replies = Number($element.find('.number_value').first().text());
     const datePosted = $element.find('.topic_date').attr('title')!;
     const author = $element.find('.topic_author').text();
 
-    console.log('title:', title, keywords.some(word=>title.includes(word || word+"s")))
-    if(keywords.some(word=>title.includes(word || word+"s"))) {
+    if(keywords.some(word=>title.includes(word.toLowerCase() || word.toLowerCase()+"s"))) {
       entries.push({title, url, content, replies, datePosted, author});
     }
     
