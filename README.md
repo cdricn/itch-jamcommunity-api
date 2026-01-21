@@ -3,11 +3,12 @@ A scraper API that collects recruitment posts in itch.io game jam community foru
 
 ## Endpoints
 GET endpoints return data in json format. <br/>
-``[GET] /jams/minMembers/{minMembers}`` - retrieve game jams from itch.io. Requires a number to set the minimum member count; the API will only return game jams that exceed this value. </br>
-``[GET] /posts/{link}/teams`` - retrieve recruitment posts from the specified game jam's community forums. Must be supplied with the sub-directory string of the game jam link. </br>
+- ``[GET] /jams/minMembers/{minMembers}`` - retrieve game jams from itch.io. Requires a number to set the minimum member count; the API will only return game jams that exceed this value. </br>
+- ``[GET] /posts/{link}/teams`` - retrieve recruitment posts from the specified game jam's community forums. Must be supplied with the sub-directory string of the game jam link. </br>
 Example: </br>
 ``Game jam link: https://itch.io/jam/super-game-jam`` </br>
 ``Endpoint link: super-game-jam`` </br>
+This endpoint returns modified data. It adds another property to the json currently not present in the html: tags. Tags is an array of strings added by the script to separate posts based on the contents of their title. I'll make an option exclude this property when retrieving posts in the future.
 
 ## Run/Deploy
 To run: </br>
