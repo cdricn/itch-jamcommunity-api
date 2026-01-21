@@ -3,12 +3,18 @@ import axios from 'axios';
 import type { Posts } from './interface';
 
 export function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
-  const keywords = ["looking", "team", "teams", "need", "group", "contribute"]; 
-  const tags = ["artist", "producer", "musician", "coder", "composer", "programmer", "developer"];
+  const keywords = [
+    "looking", "team", "need", "group", "contribute", //priority
+    "actor", "artist", "producer", "musician", "coder", "composer", 
+    "programmer", "developer"
+  ]; 
+  const tags = [
+    "artist", "producer", "musician", "coder", "composer", "programmer", "developer"
+  ];
 
   $('.topic_row').each((_, element) => {
     const $element = $(element);
-    const title = $element.find('.topic_link').text();
+    const title = $element.find('.topic_link').text().toLowerCase();
     const url = 'https://itch.io' + $element.find('.topic_title').find('a').attr('href');
     const content = $element.find('.topic_preview').text();
     const replies = Number($element.find('.number_value').first().text());
@@ -16,7 +22,8 @@ export function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
     const author = $element.find('.topic_author').text();
     let tag = 'generic';
 
-    if(keywords.some(word=>title.includes(word))) {
+    console.log('title:', title, keywords.some(word=>title.includes(word || word+"s")))
+    if(keywords.some(word=>title.includes(word || word+"s"))) {
       for(const item of tags) {
         if(title.includes(item)){
           tag = item;
