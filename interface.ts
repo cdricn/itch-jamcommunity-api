@@ -13,6 +13,5 @@ export interface Posts {
   content: string,
   replies: number,
   datePosted: string,
-  author: string
-  tag: string;
+  author: string,
 }

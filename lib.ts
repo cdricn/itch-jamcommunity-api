@@ -8,9 +8,6 @@ export function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
     "actor", "artist", "producer", "musician", "coder", "composer", 
     "programmer", "developer"
   ]; 
-  const tags = [
-    "artist", "producer", "musician", "coder", "composer", "programmer", "developer"
-  ];
 
   $('.topic_row').each((_, element) => {
     const $element = $(element);
@@ -20,16 +17,10 @@ export function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
     const replies = Number($element.find('.number_value').first().text());
     const datePosted = $element.find('.topic_date').attr('title')!;
     const author = $element.find('.topic_author').text();
-    let tag = 'generic';
 
     console.log('title:', title, keywords.some(word=>title.includes(word || word+"s")))
     if(keywords.some(word=>title.includes(word || word+"s"))) {
-      for(const item of tags) {
-        if(title.includes(item)){
-          tag = item;
-        } 
-      }
-      entries.push({title, url, content, replies, datePosted, author, tag});
+      entries.push({title, url, content, replies, datePosted, author});
     }
     
   });
