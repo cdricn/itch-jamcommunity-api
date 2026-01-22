@@ -9,11 +9,12 @@ const PORT = 8000;
 const app = express();
 
 
-app.get('/jams/:members', (req, res) => {
+app.get('/jams/minMembers/:minMembers', (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
   axios.get('https://itch.io/jams/in-progress/ranked/with-participants')
     .then((response) => {
       let entries : Entries[] = [];
+      const minMembers = req.params.minMembers;
       const html = response.data;
       const $ = cheerio.load(html);
  
@@ -25,7 +26,7 @@ app.get('/jams/:members', (req, res) => {
         const deadline = $element.find('.date_countdown').text();
         const host = $element.find('.hosted_by').text().slice(10);
         
-        if (members >= Number(req.params.members)) {
+        if (members >= Number(minMembers)) {
           entries.push({title, url, members, deadline, host});
         }
       });
@@ -37,7 +38,7 @@ app.get('/jams/:members', (req, res) => {
     })
 });
 
-app.get('/posts/:jamLink', async (req, res) => {
+app.get('/posts/:jamLink/teams', async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
   const jamLink = 'https://itch.io/jam/' + req.params.jamLink + '/community';
   const entries : Posts[] | undefined = await LoadPage(jamLink, []);
