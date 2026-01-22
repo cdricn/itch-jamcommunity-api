@@ -2,13 +2,13 @@ import * as cheerio from 'cheerio';
 import axios from 'axios';
 import type { Posts } from './interface';
 
-export function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
+export function GetPosts($:cheerio.CheerioAPI) {
   const keywords = [
     "looking", "team", "need", "group", "contribute", //priority
     "actor", "artist", "producer", "musician", "coder", "composer", 
     "programmer", "developer"
   ]; 
-
+  const entries : Posts[] = [];
   $('.topic_row').each((_, element) => {
     const $element = $(element);
     const title = $element.find('.topic_link').text();
@@ -19,7 +19,6 @@ export function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
     const author = $element.find('.topic_author').text();
 
     if(keywords.some(word=>title.includes(word.toLowerCase() || word.toLowerCase()+"s"))) {
-      
       entries.push({title, url, content, replies, datePosted, author});
     }
     
@@ -27,22 +26,23 @@ export function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
   return entries;
 }
 
-export async function LoadPage(currentPageLink:string, entries:Posts[]) {
+export async function LoadPage(currentPageLink:string) {
   try {
-    const response = await axios.get(currentPageLink);
+    let nextPageText = 'Next page';
+    let nextPageLink = currentPageLink;
+    let entries : Posts[] = [];
 
-    const html = response.data;
-    const $ = cheerio.load(html);
-
-    const nextPageText = $('.category_pager').find('a').first().text();
-    const nextPageLink = 'https://itch.io' + $('.category_pager').find('a').attr('href');
-
-    const collectedEntries = GetPosts($, entries);
-    entries.concat(collectedEntries);
-
-    if (nextPageText==='Next page') {
-      const newEntries = await LoadPage(nextPageLink, entries);
-      if (newEntries) entries.concat();
+    while(nextPageText==='Next page') {
+      let response = await axios.get(nextPageLink);
+      let html = response.data;
+      let $ = cheerio.load(html);
+      nextPageText = $('.category_pager').find('a').first().text();
+      nextPageLink = 'https://itch.io' + $('.category_pager').find('a').attr('href');
+      
+      let collectedEntries = GetPosts($);
+      if (collectedEntries) {
+        entries = entries.concat(collectedEntries);
+      };
     }
     return entries;
   }

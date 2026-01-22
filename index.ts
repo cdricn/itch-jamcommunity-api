@@ -39,9 +39,10 @@ app.get('/jams/minMembers/:minMembers', (req, res) => {
 });
 
 app.get('/posts/:jamLink/teams', async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  console.log('RUNNING');
   const jamLink = 'https://itch.io/jam/' + req.params.jamLink + '/community';
-  const entries : Posts[] | undefined = await LoadPage(jamLink, []);
+  const entries : Posts[] | undefined = await LoadPage(jamLink);
   res.json(entries);
 });
 
