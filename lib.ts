@@ -19,6 +19,7 @@ export function GetPosts($:cheerio.CheerioAPI, entries:Posts[]) {
     const author = $element.find('.topic_author').text();
 
     if(keywords.some(word=>title.includes(word.toLowerCase() || word.toLowerCase()+"s"))) {
+      
       entries.push({title, url, content, replies, datePosted, author});
     }
     
