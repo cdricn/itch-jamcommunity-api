@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio';
 import axios from 'axios';
-import type { Posts } from './interface';
+import type { Posts, JamInfo } from './interface';
 
 export function GetPosts($:cheerio.CheerioAPI) {
   const keywords = [
@@ -26,28 +26,30 @@ export function GetPosts($:cheerio.CheerioAPI) {
   return entries;
 }
 
-export async function LoadPage(currentPageLink:string) {
+export async function GetGameJams(minMembers:number, link:string) {
   try {
-    let nextPageText = 'Next page';
-    let nextPageLink = currentPageLink;
-    let entries : Posts[] = [];
+    let response = await axios.get(link);
+    let html = response.data;
+    let $ = cheerio.load(html);
+    let entries : JamInfo[] = [];
 
-    while(nextPageText==='Next page') {
-      let response = await axios.get(nextPageLink);
-      let html = response.data;
-      let $ = cheerio.load(html);
-      nextPageText = $('.category_pager').find('a').first().text();
-      nextPageLink = 'https://itch.io' + $('.category_pager').find('a').attr('href');
-      
-      let collectedEntries = GetPosts($);
-      if (collectedEntries) {
-        entries = entries.concat(collectedEntries);
-      };
-    }
+    $('.jam').each((_, element) => {
+      const $element = $(element);
+      const title = $element.find('.primary_info').text();
+      const url = 'https://itch.io' + $element.find('a').attr('href');
+      const members = Number($element.find('.stat').find('.number').first().text().replace(/[^a-zA-Z0-9]/g, '')); 
+      const deadline = $element.find('.date_countdown').text();
+      const host = $element.find('.hosted_by').text().slice(10);
+
+      if (members >= Number(minMembers)) {
+        entries.push({title, url, members, deadline, host});
+      }
+    });
+
     return entries;
   }
   catch (e) {
-    console.log('Something went wrong.', e);
+    console.log('Something went wrong while fetching game jams.', e);
     return undefined;
-  }  
+  }
 }
