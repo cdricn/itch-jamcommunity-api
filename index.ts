@@ -1,8 +1,8 @@
 import express from 'express';
 import * as cheerio from 'cheerio';
 import axios from 'axios';
-import type { JamInfo, Posts } from './interface';
-import { GetGameJams, GetPosts } from './lib.ts'; //keep as .js in prod or else vercel will kill itself 
+import type { Entries, GameJamInfo, Posts } from './interface';
+import { GetGameJams, GetPosts } from './lib.js'; //keep as .js in prod or else vercel will kill itself 
 // import testData from './test.json'
 
 const PORT = 8000;
@@ -13,7 +13,7 @@ app.get('/gamejams/minMembers/:minMembers', async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   try {
     const minMembers = req.params.minMembers;
-    let entries : JamInfo[] = [];
+    let entries : Entries[] = [];
     let linkOngoing = 'https://itch.io/jams/in-progress/ranked/with-participants';
     let linkUpcoming = 'https://itch.io/jams/upcoming/ranked/with-participants';
     
@@ -41,20 +41,22 @@ app.get('/gamejam/details/:link', async (req, res) => {
   const link = 'https://itch.io/jam/' + req.params.link;
 
   axios.get(link).then((response) => {
-      let entries : JamInfo[] = [];
+      let entries : GameJamInfo = { 
+        title:'', host:'', members:0, startDate:'', endDate:''
+      };
       const html = response.data;
       const $ = cheerio.load(html);
  
-      $('.view_jam_page').each((_, element) => {
+      $('.jam_body').each((_, element) => {
         const $element = $(element);
-        const title = $element.find('.user_formatted').text();
-        const url = 'https://itch.io' + $element.find('a').attr('href');
-        const members = Number($element.find('.stat').find('.number').first().text()); 
-        const deadline = $element.find('.date_countdown').text();
-        const host = $element.find('.hosted_by').text().slice(10);
-        console.log(title)
+        const title = $element.find('.jam_title_header').text();
+        const host = $element.find('.jam_host_header').text();
+        const members = Number($element.find('.stat_value').text().replace(/[^a-zA-Z0-9]/g, '')); 
+        const startDate = $element.find('.date_format:nth-child(1)').text();
+        const endDate = $element.find('.date_format:nth-child(2)').text();
+        
+        entries = {title, host, members, startDate, endDate};
       });
-
       res.json(entries);
 
     }).catch((err) => {

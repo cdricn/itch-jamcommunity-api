@@ -7,12 +7,12 @@ export interface Entries {
   host: string
 }
 
-export interface JamInfo {
+export interface GameJamInfo {
   title: string,
-  url: string,
+  host: string,
   members: number,
-  deadline: string,
-  host: string
+  startDate: string,
+  endDate: string
 }
 
 export interface Posts {

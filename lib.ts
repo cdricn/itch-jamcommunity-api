@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio';
 import axios from 'axios';
-import type { Posts, JamInfo, TagType } from './interface';
+import type { Posts, Entries, TagType } from './interface';
 
 export function GetPosts($:cheerio.CheerioAPI) {
   const keywords = [
@@ -14,7 +14,7 @@ export function GetPosts($:cheerio.CheerioAPI) {
     const title = $element.find('.topic_link').text();
     const url = 'https://itch.io' + $element.find('.topic_title').find('a').attr('href');
     const content = $element.find('.topic_preview').text();
-    const replies = Number($element.find('.number_value').first().text());
+    const replies = Number($element.find('.number_value').first().text().replace(/[^a-zA-Z0-9]/g, ''));
     const datePosted = $element.find('.topic_date').attr('title')!;
     const author = $element.find('.topic_author').text();
 
@@ -81,7 +81,7 @@ export async function GetGameJams(minMembers:number, link:string) {
     let response = await axios.get(link);
     let html = response.data;
     let $ = cheerio.load(html);
-    let entries : JamInfo[] = [];
+    let entries : Entries[] = [];
 
     $('.jam').each((_, element) => {
       const $element = $(element);
