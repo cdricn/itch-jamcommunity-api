@@ -2,7 +2,7 @@ import express from 'express';
 import * as cheerio from 'cheerio';
 import axios from 'axios';
 import type { JamInfo, Posts } from './interface';
-import { GetGameJams, GetPosts } from './lib.js'; //keep as .js in prod or else vercel will kill itself 
+import { GetGameJams, GetPosts } from './lib.ts'; //keep as .js in prod or else vercel will kill itself 
 // import testData from './test.json'
 
 const PORT = 8000;
@@ -84,7 +84,6 @@ app.get('/gamejam/posts/:link', async (req, res) => {
       };
     }
     
-    console.log(entries);
     res.json(entries);
   }
 
