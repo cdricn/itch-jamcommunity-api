@@ -51,7 +51,7 @@ app.get('/gamejam/details/:link', async (req, res) => {
         const $element = $(element);
         const title = $element.find('.jam_title_header').text();
         const host = $element.find('.jam_host_header').text();
-        const members = Number($element.find('.stat_value').text().replace(/[^a-zA-Z0-9]/g, '')); 
+        const members = Number($element.find('.stat_box:nth-child(1)').find('.stat_value').text().replace(/[^a-zA-Z0-9]/g, '')); 
         const startDate = $element.find('.date_format:nth-child(1)').text();
         const endDate = $element.find('.date_format:nth-child(2)').text();
         
