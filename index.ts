@@ -84,6 +84,7 @@ app.get('/gamejam/posts/:link', async (req, res) => {
       };
     }
     
+    console.log(entries);
     res.json(entries);
   }
 

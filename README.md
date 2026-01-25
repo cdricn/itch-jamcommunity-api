@@ -8,7 +8,7 @@ GET endpoints return data in json format. <br/>
 Example: </br>
 ``Game jam link: https://itch.io/jam/super-game-jam`` </br>
 ``Endpoint link: super-game-jam`` </br>
-This endpoint returns modified data. It adds another property to the json currently not present in the html: tags. Tags is an array of strings added by the script to separate posts based on the contents of their title. I'll make an option exclude this property when retrieving posts in the future.
+This endpoint modifies the data by adding a Tags property to the json. Tags is an array of strings added by the script to separate posts based on the contents of their title.
 
 ## Run/Deploy
 To run: </br>

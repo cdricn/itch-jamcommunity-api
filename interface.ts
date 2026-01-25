@@ -22,4 +22,9 @@ export interface Posts {
   replies: number,
   datePosted: string,
   author: string,
+  tags: TagType
+}
+
+export interface TagType {
+  [tag:string] : string;
 }
