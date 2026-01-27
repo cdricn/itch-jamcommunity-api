@@ -17,20 +17,24 @@ app.get('/gamejams/minMembers/:minMembers', async (req, res) => {
     let linkUpcoming = 'https://itch.io/jams/upcoming/ranked/with-participants';
     
     let entriesOngoing = await GetGameJams(Number(minMembers), linkOngoing);
-    let entriesUpcoming = await GetGameJams(Number(minMembers), linkUpcoming);
-    
     if (entriesOngoing) {
       entries = entries.concat(entriesOngoing);
     }
+
+    let entriesUpcoming = await GetGameJams(Number(minMembers), linkUpcoming);
     if (entriesUpcoming) {
       entries = entries.concat(entriesUpcoming);
     }
 
-    return res.json(entries);
+    if (entries.length > 0) {
+      return res.json(entries);
+    } else {
+      res.status(404).send('Something went wrong while fetching data.');
+    }
   }
   catch (err) {
-    console.log('Something went wrong while fetching game jams.');
-    res.status(404).send('Invalid data.');
+    console.log('Something happened while fettching game jam data. Req Param:', req.params.minMembers);
+    throw err;
   }
 });
 
@@ -38,29 +42,35 @@ app.get('/gamejam/details/:link', async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   const link = 'https://itch.io/jam/' + req.params.link;
 
-  axios.get(link).then((response) => {
-    let entries : GameJamInfo = { 
-      title:'', host:'', members:0, startDate:'', endDate:''
-    };
-    const html = response.data;
-    const $ = cheerio.load(html);
+  try {
+    axios.get(link).then((response) => {
+      let entries : GameJamInfo = { 
+        title:'', host:'', members:0, startDate:'', endDate:''
+      };
+      const html = response.data;
+      const $ = cheerio.load(html);
 
-    $('.jam_body').each((_, element) => {
-      const $element = $(element);
-      const title = $element.find('.jam_title_header').text();
-      const host = $element.find('.jam_host_header').text();
-      const members = Number($element.find('.stat_box:nth-child(1)').find('.stat_value').text().replace(/[^a-zA-Z0-9]/g, '')); 
-      const startDate = $element.find('.date_format:nth-child(1)').text();
-      const endDate = $element.find('.date_format:nth-child(2)').text();
-      
-      entries = {title, host, members, startDate, endDate};
-    });
-    res.json(entries);
+      $('.jam_body').each((_, element) => {
+        const $element = $(element);
+        const title = $element.find('.jam_title_header').text();
+        const host = $element.find('.jam_host_header').text();
+        const members = Number($element.find('.stat_box:nth-child(1)').find('.stat_value').text().replace(/[^a-zA-Z0-9]/g, '')); 
+        const startDate = $element.find('.date_format:nth-child(1)').text();
+        const endDate = $element.find('.date_format:nth-child(2)').text();
+        
+        entries = {title, host, members, startDate, endDate};
+      });
+      res.json(entries);
 
-  }).catch((err) => {
-    console.log('Error fetching game jam information.');
-    res.status(404).send('Invalid data.');
-  })
+    }).catch((err) => {
+      console.log('Error fetching game jam information.');
+      res.status(404).send('Invalid data.');
+    })
+  }
+  catch (err) {
+    console.log('Something happened while fetching game jam details. Req Param:', req.params.link);
+    throw err;
+  }
 });
 
 app.get('/gamejam/posts/:link', async (req, res) => {
