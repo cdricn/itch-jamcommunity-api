@@ -28,8 +28,9 @@ app.get('/gamejams/minMembers/:minMembers', async (req, res) => {
 
     return res.json(entries);
   }
-  catch (e) {
-    console.log('Something went wrong while fetching game jams.', e);
+  catch (err) {
+    console.log('Something went wrong while fetching game jams.', err);
+    throw err;
   }
 });
 
@@ -58,6 +59,7 @@ app.get('/gamejam/details/:link', async (req, res) => {
 
   }).catch((err) => {
     console.log('Error fetching game jam information.',err);
+    throw err;
   })
 });
 
@@ -84,8 +86,10 @@ app.get('/gamejam/posts/:link', async (req, res) => {
     res.json(entries);
   }
 
-  catch (e) {
-    console.log('Something went wrong while fetching posts.');
+  catch (err) {
+    console.log(`Something went wrong while fetching posts. Link: ${link}`);
+    console.log(err);
+    throw err;
   }  
 });
 

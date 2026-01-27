@@ -2,9 +2,36 @@ import * as cheerio from 'cheerio';
 import axios from 'axios';
 import type { Posts, Entries, TagType } from './interface';
 
+export async function GetGameJams(minMembers:number, link:string) {
+  try {
+    let response = await axios.get(link);
+    let html = response.data;
+    let $ = cheerio.load(html);
+    let entries : Entries[] = [];
+
+    $('.jam').each((_, element) => {
+      const $element = $(element);
+      const title = $element.find('.primary_info').text();
+      const url = 'https://itch.io' + $element.find('a').attr('href');
+      const members = Number($element.find('.stat').find('.number').first().text().replace(/[^a-zA-Z0-9]/g, '')); 
+      const deadline = $element.find('.date_countdown').text();
+      const host = $element.find('.hosted_by').text().slice(10);
+
+      if (members >= Number(minMembers)) {
+        entries.push({title, url, members, deadline, host});
+      }
+    });
+
+    return entries;
+  }
+  catch (err) {
+    console.log('Something went wrong while fetching game jams.', err);
+    throw err;
+  }
+}
+
 export function GetPosts($:cheerio.CheerioAPI) {
   try {
-    console.log('fetching')
     const keywords = [
       "looking", "team", "need", "group", "contribute", //priority
       "actor", "artist", "producer", "musician", "coder", "composer", 
@@ -29,8 +56,9 @@ export function GetPosts($:cheerio.CheerioAPI) {
 
     return entries;
   }
-  catch (e) {
-    console.log('Something went wrong while fetching posts', e);
+  catch (err) {
+    console.log('Something went wrong while fetching posts', err);
+    throw err;
   }
 }
 
@@ -81,31 +109,4 @@ function AddTags(title:string) {
     }
   }
   return tags;
-}
-
-export async function GetGameJams(minMembers:number, link:string) {
-  try {
-    let response = await axios.get(link);
-    let html = response.data;
-    let $ = cheerio.load(html);
-    let entries : Entries[] = [];
-
-    $('.jam').each((_, element) => {
-      const $element = $(element);
-      const title = $element.find('.primary_info').text();
-      const url = 'https://itch.io' + $element.find('a').attr('href');
-      const members = Number($element.find('.stat').find('.number').first().text().replace(/[^a-zA-Z0-9]/g, '')); 
-      const deadline = $element.find('.date_countdown').text();
-      const host = $element.find('.hosted_by').text().slice(10);
-
-      if (members >= Number(minMembers)) {
-        entries.push({title, url, members, deadline, host});
-      }
-    });
-
-    return entries;
-  }
-  catch (e) {
-    console.log('Something went wrong while fetching game jams.', e);
-  }
 }
