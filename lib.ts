@@ -25,7 +25,7 @@ export async function GetGameJams(minMembers:number, link:string) {
     return entries;
   }
   catch (err) {
-    console.log('Something went wrong while fetching game jams.', err);
+    console.log('Something went wrong while fetching game jams.');
     throw err;
   }
 }
@@ -57,8 +57,8 @@ export function GetPosts($:cheerio.CheerioAPI) {
     return entries;
   }
   catch (err) {
-    console.log('Something went wrong while fetching posts', err);
-    throw err;
+    console.log('Something went wrong while fetching posts');
+    // throw err;
   }
 }
 

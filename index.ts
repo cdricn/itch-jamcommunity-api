@@ -29,8 +29,8 @@ app.get('/gamejams/minMembers/:minMembers', async (req, res) => {
     return res.json(entries);
   }
   catch (err) {
-    console.log('Something went wrong while fetching game jams.', err);
-    throw err;
+    console.log('Something went wrong while fetching game jams.');
+    res.status(404).send('Invalid data.');
   }
 });
 
@@ -58,8 +58,8 @@ app.get('/gamejam/details/:link', async (req, res) => {
     res.json(entries);
 
   }).catch((err) => {
-    console.log('Error fetching game jam information.',err);
-    throw err;
+    console.log('Error fetching game jam information.');
+    res.status(404).send('Invalid data.');
   })
 });
 
@@ -88,8 +88,7 @@ app.get('/gamejam/posts/:link', async (req, res) => {
 
   catch (err) {
     console.log(`Something went wrong while fetching posts. Link: ${link}`);
-    console.log(err);
-    throw err;
+    res.status(404).send('Invalid data.');
   }  
 });
 
