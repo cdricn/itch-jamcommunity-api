@@ -3,28 +3,35 @@ import axios from 'axios';
 import type { Posts, Entries, TagType } from './interface';
 
 export function GetPosts($:cheerio.CheerioAPI) {
-  const keywords = [
-    "looking", "team", "need", "group", "contribute", //priority
-    "actor", "artist", "producer", "musician", "coder", "composer", 
-    "programmer", "developer"
-  ]; 
-  const entries : Posts[] = [];
-  $('.topic_row').each((_, element) => {
-    const $element = $(element);
-    const title = $element.find('.topic_link').text();
-    const url = 'https://itch.io' + $element.find('.topic_title').find('a').attr('href');
-    const content = $element.find('.topic_preview').text();
-    const replies = Number($element.find('.number_value').first().text().replace(/[^a-zA-Z0-9]/g, ''));
-    const datePosted = $element.find('.topic_date').attr('title')!;
-    const author = $element.find('.topic_author').text();
+  try {
+    console.log('fetching')
+    const keywords = [
+      "looking", "team", "need", "group", "contribute", //priority
+      "actor", "artist", "producer", "musician", "coder", "composer", 
+      "programmer", "developer"
+    ]; 
+    const entries : Posts[] = [];
+    $('.topic_row').each((_, element) => {
+      const $element = $(element);
+      const title = $element.find('.topic_link').text();
+      const url = 'https://itch.io' + $element.find('.topic_title').find('a').attr('href');
+      const content = $element.find('.topic_preview').text();
+      const replies = Number($element.find('.number_value').first().text().replace(/[^a-zA-Z0-9]/g, ''));
+      const datePosted = $element.find('.topic_date').attr('title')!;
+      const author = $element.find('.topic_author').text();
 
-    if(keywords.some(word=>title.includes(word.toLowerCase() || word.toLowerCase()+"s"))) {
-      let tags = AddTags(title);
-      entries.push({title, url, content, replies, datePosted, author, tags});
-    }
-    
-  });
-  return entries;
+      if(keywords.some(word=>title.includes(word.toLowerCase() || word.toLowerCase()+"s"))) {
+        let tags = AddTags(title);
+        entries.push({title, url, content, replies, datePosted, author, tags});
+      }
+      
+    });
+
+    return entries;
+  }
+  catch (e) {
+    console.log('Something went wrong while fetching posts', e);
+  }
 }
 
 function AddTags(title:string) {
@@ -100,6 +107,5 @@ export async function GetGameJams(minMembers:number, link:string) {
   }
   catch (e) {
     console.log('Something went wrong while fetching game jams.', e);
-    return undefined;
   }
 }
