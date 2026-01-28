@@ -1,3 +1,7 @@
+export interface EntriesType {
+  upcoming: Entries[];
+  ongoing: Entries[];
+}
 
 export interface Entries {
   title: string,

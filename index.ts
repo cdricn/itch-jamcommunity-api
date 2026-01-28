@@ -1,7 +1,7 @@
 import express from 'express';
 import * as cheerio from 'cheerio';
 import axios from 'axios';
-import type { Entries, GameJamInfo, Posts } from './interface';
+import type { EntriesType, Entries, GameJamInfo, Posts } from './interface';
 import { GetGameJams, GetPosts } from './lib.js'; //keep as .js in prod or else vercel will kill itself 
 // import testData from './test.json'
 
@@ -12,21 +12,21 @@ app.get('/gamejams/minMembers/:minMembers', async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   try {
     const minMembers = req.params.minMembers;
-    let entries : Entries[] = [];
+    let entries : EntriesType = {upcoming:[], ongoing:[]};
     let linkOngoing = 'https://itch.io/jams/in-progress/ranked/with-participants';
     let linkUpcoming = 'https://itch.io/jams/upcoming/ranked/with-participants';
-    
     let entriesOngoing = await GetGameJams(Number(minMembers), linkOngoing);
     if (entriesOngoing) {
-      entries = entries.concat(entriesOngoing);
+      entries.ongoing = entriesOngoing;
     }
 
     let entriesUpcoming = await GetGameJams(Number(minMembers), linkUpcoming);
     if (entriesUpcoming) {
-      entries = entries.concat(entriesUpcoming);
+      entries.upcoming = entriesUpcoming;
+      console.log('TEST', entriesUpcoming)
     }
 
-    if (entries.length > 0) {
+    if (entries.ongoing.length > 0) {
       return res.json(entries);
     } else {
       res.status(404).send('Something went wrong while fetching data.');
