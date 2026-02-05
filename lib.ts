@@ -30,13 +30,14 @@ export async function GetGameJams(minMembers:number, link:string) {
   }
 }
 
-export function GetPosts($:cheerio.CheerioAPI) {
+export function GetPosts($:cheerio.CheerioAPI, index:number) {
   try {
     const keywords = [
       "looking", "team", "need", "group", "contribute", //priority
       "actor", "artist", "producer", "musician", "coder", "composer", 
       "programmer", "developer"
     ]; 
+
     const entries : Posts[] = [];
     $('.topic_row').each((_, element) => {
       const $element = $(element);
@@ -47,11 +48,11 @@ export function GetPosts($:cheerio.CheerioAPI) {
       const datePosted = $element.find('.topic_date').attr('title')!;
       const author = $element.find('.topic_author').text();
 
-      if(keywords.some(word=>title.includes(word.toLowerCase() || word.toLowerCase()+"s"))) {
+      if(keywords.some(word=>title.toLowerCase().includes(word || word+"s"))) {
         let tags = AddTags(title);
-        entries.push({title, url, content, replies, datePosted, author, tags});
+        index+=1;
+        entries.push({index, title, url, content, replies, datePosted, author, tags});
       }
-      
     });
 
     return entries;

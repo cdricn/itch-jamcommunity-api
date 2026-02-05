@@ -1,9 +1,8 @@
 import express from 'express';
 import * as cheerio from 'cheerio';
 import axios from 'axios';
-import type { EntriesType, Entries, GameJamInfo, Posts } from './interface';
-import { GetGameJams, GetPosts } from './lib.js'; //keep as .js in prod or else vercel will kill itself 
-// import testData from './test.json'
+import type { EntriesType, GameJamInfo, Posts } from './interface';
+import { GetGameJams, GetPosts } from './lib.ts'; //keep as .js in prod or else vercel will kill itself 
 
 const PORT = 8000;
 const app = express();
@@ -88,7 +87,7 @@ app.get('/gamejam/posts/:link', async (req, res) => {
       nextPageText = $('.category_pager').find('a').first().text();
       nextPageLink = 'https://itch.io' + $('.category_pager').find('a').attr('href');
       
-      let collectedEntries = GetPosts($);
+      let collectedEntries = GetPosts($, entries[entries.length-1] ? entries[entries.length-1].index : 0);
       if (collectedEntries) {
         entries = entries.concat(collectedEntries);
       };
@@ -101,11 +100,6 @@ app.get('/gamejam/posts/:link', async (req, res) => {
     res.status(404).send('Invalid data.');
   }  
 });
-
-// In case connection can't be made; use test to to run app on test data, 
-/* app.get('/test', async (req, res) => {
-  return testData;
-}) */
 
 app.listen(PORT, () => console.log(`server running on PORT ${PORT}`));
 
