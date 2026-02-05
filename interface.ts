@@ -20,7 +20,6 @@ export interface GameJamInfo {
 }
 
 export interface Posts {
-  index: number,
   title: string,
   url: string,
   content: string,

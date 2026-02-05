@@ -87,7 +87,7 @@ app.get('/gamejam/posts/:link', async (req, res) => {
       nextPageText = $('.category_pager').find('a').first().text();
       nextPageLink = 'https://itch.io' + $('.category_pager').find('a').attr('href');
       
-      let collectedEntries = GetPosts($, entries[entries.length-1] ? entries[entries.length-1].index : 0);
+      let collectedEntries = GetPosts($);
       if (collectedEntries) {
         entries = entries.concat(collectedEntries);
       };

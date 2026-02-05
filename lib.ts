@@ -30,7 +30,7 @@ export async function GetGameJams(minMembers:number, link:string) {
   }
 }
 
-export function GetPosts($:cheerio.CheerioAPI, index:number) {
+export function GetPosts($:cheerio.CheerioAPI) {
   try {
     const keywords = [
       "looking", "team", "need", "group", "contribute", //priority
@@ -50,8 +50,7 @@ export function GetPosts($:cheerio.CheerioAPI, index:number) {
 
       if(keywords.some(word=>title.toLowerCase().includes(word || word+"s"))) {
         let tags = AddTags(title);
-        index+=1;
-        entries.push({index, title, url, content, replies, datePosted, author, tags});
+        entries.push({title, url, content, replies, datePosted, author, tags});
       }
     });
 
