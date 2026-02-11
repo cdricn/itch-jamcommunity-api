@@ -1,6 +1,8 @@
 import * as cheerio from 'cheerio';
 import axios from 'axios';
 import type { Posts, Entries, TagType } from './interface';
+import { keywords } from './keywords.js';
+import { defined_tags } from './definedTags.js';
 
 export async function GetGameJams(minMembers:number, link:string) {
   try {
@@ -31,13 +33,8 @@ export async function GetGameJams(minMembers:number, link:string) {
 }
 
 export function GetPosts($:cheerio.CheerioAPI) {
+  
   try {
-    const keywords = [
-      "looking", "team", "need", "group", "contribute", //priority
-      "actor", "artist", "producer", "musician", "coder", "composer", 
-      "programmer", "developer"
-    ]; 
-
     const entries : Posts[] = [];
     $('.topic_row').each((_, element) => {
       const $element = $(element);
@@ -48,9 +45,15 @@ export function GetPosts($:cheerio.CheerioAPI) {
       const datePosted = $element.find('.topic_date').attr('title')!;
       const author = $element.find('.topic_author').text();
 
-      if(keywords.some(word=>title.toLowerCase().includes(word || word+"s"))) {
-        let tags = AddTags(title);
-        entries.push({title, url, content, replies, datePosted, author, tags});
+      const titleArr = title.toLowerCase().split(' ');
+      for(let i=0; i<titleArr.length; i++) {
+        const split = titleArr[i].replace(/[^a-zA-Z0-9\/]/g, '').split('/');
+        
+        if(Object.hasOwn(keywords, split[0] || split[1])) {
+          let tags = AddTags(title);
+          entries.push({title, url, content, replies, datePosted, author, tags});
+          break;
+        } 
       }
     });
 
@@ -58,30 +61,11 @@ export function GetPosts($:cheerio.CheerioAPI) {
   }
   catch (err) {
     console.log('Something went wrong while fetching posts');
-    // throw err;
   }
 }
 
 function AddTags(title:string) {
-  const definedTags : TagType = {
-    programmer: "developer", 
-    developer: "developer",
-    dev: "developer",
-    coder: "developer",
-    sound: "music",
-    audio: "music",
-    musician: "music",
-    music: "music",
-    composer: "music", 
-    sfx: "music",
-    artist: "artist", 
-    voice: "voice actor", 
-    actor: "voice actor",
-    va: "voice actor",
-    narrative: "writer",
-    writer: "writer",
-    playtester: "playtester"
-  };
+  const definedTags : TagType = {...defined_tags};
   const titleArray = title.split(" ");
   let tags : TagType = {};
 
