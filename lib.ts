@@ -1,8 +1,8 @@
 import * as cheerio from 'cheerio';
 import axios from 'axios';
-import type { Posts, Entries, TagType } from './interface';
-import { keywords } from './keywords.js';
-import { defined_tags } from './definedTags.js';
+import type { Posts, Entries, TagType } from './interface.ts';
+import { keywords } from './keywords.ts';
+import { defined_tags } from './definedTags.ts';
 
 export async function GetGameJams(minMembers:number, link:string) {
   try {
@@ -45,15 +45,30 @@ export function GetPosts($:cheerio.CheerioAPI) {
       const datePosted = $element.find('.topic_date').attr('title')!;
       const author = $element.find('.topic_author').text();
 
+      // put title into an array
       const titleArr = title.toLowerCase().split(' ');
-      for(let i=0; i<titleArr.length; i++) {
-        const split = titleArr[i].replace(/[^a-zA-Z0-9\/]/g, '').split('/');
-        
-        if(Object.hasOwn(keywords, split[0] || split[1])) {
-          let tags = AddTags(title);
-          entries.push({title, url, content, replies, datePosted, author, tags});
-          break;
-        } 
+
+      for (let i=0; i<titleArr.length; i++) {
+        // put in variable before checking to avoid ts error
+        const word = titleArr[i];
+        if (word !== undefined) {
+          // remove special characters from the word EXCEPT '/'
+          // because the keywords we look for may be written with one; e.g. 'Member needed!'
+          // however, we keep the slash because some titles use it; e.g. 'Developer/VA needed!'
+          // then we just separate them later
+          const split = word.replace(/[^a-zA-Z0-9\/]/g, '').split('/');
+          
+          // split will put the whole word in an array if there's nothing to split
+          // so index 0 will always have a value, but not 1
+          const splitOne = split[0];
+          const splitTwo = split[1] ? split[1] : '';
+
+          if (Object.hasOwn(keywords, splitOne || splitTwo)) {
+            let tags = AddTags(title);
+            entries.push({title, url, content, replies, datePosted, author, tags});
+            break;
+          } 
+        }
       }
     });
 
@@ -64,31 +79,39 @@ export function GetPosts($:cheerio.CheerioAPI) {
   }
 }
 
-function AddTags(title:string) {
-  const definedTags : TagType = {...defined_tags};
-  const titleArray = title.split(" ");
+function AddTags(fullTitle:string) {
+  const definedTags : TagType = defined_tags;
+  
+  const titleArray = fullTitle.split(" ");
   let tags : TagType = {};
-
-  for (const word in titleArray) {
-    let title = titleArray[word].toLowerCase();
-    if (title[title.length-1] === 's') title=title.slice(0,title.length-1);
-    if (definedTags.hasOwnProperty(title)) {
-      //remove special chars
-      title = title.replace(/[^a-zA-Z0-9]/g, '');
-      tags[definedTags[title]] = definedTags[title];
+  console.log('==============Full Title==============', fullTitle)
+  
+  for (const i in titleArray) {
+    let word = titleArray[i]!.toLowerCase();
+    // turn word into singular form
+    if (word[word.length-1] === 's') {
+      word = word.slice(0,word.length-1);
     }
+
+    if (Object.hasOwn(definedTags, word)) {
+      word = word.replace(/[^a-zA-Z0-9]/g, '');
+
+      // store and check to tell typescript it's not underfined
+      const mapped_tag = definedTags[word];
+      if (mapped_tag) tags[mapped_tag] = mapped_tag;
+    }
+
     //if the word has a slash, we split again; ex: "musician/composer"
-    else if (titleArray[word].includes("/")) {
-      //split first, then remove remaining special characters
-      let [firstWord, secondWord] = title.split("/");
-      firstWord = firstWord.replace(/[^a-zA-Z0-9]/g, '');
-      secondWord = secondWord.replace(/[^a-zA-Z0-9]/g, '');
+    else if (word.includes("/")) {
+      let [firstWord, secondWord] = word.replace(/[^a-zA-Z0-9\/]/g, '').split("/");
+      firstWord = firstWord ? definedTags[firstWord] : '';
+      secondWord = secondWord ? definedTags[secondWord] : '';
       
-      if (definedTags.hasOwnProperty(firstWord)) {
-        tags[definedTags[firstWord]] = definedTags[firstWord];
+      if (firstWord && Object.hasOwn(definedTags, firstWord)) {
+        tags[firstWord] = firstWord;
       }
-      if (definedTags.hasOwnProperty(secondWord)) {
-        tags[definedTags[secondWord]] = definedTags[secondWord];
+      if (secondWord && Object.hasOwn(definedTags, secondWord)) {
+        tags[secondWord] = secondWord;
       }
     }
   }
