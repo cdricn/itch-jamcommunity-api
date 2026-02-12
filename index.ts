@@ -2,7 +2,7 @@ import express from 'express';
 import * as cheerio from 'cheerio';
 import axios from 'axios';
 import type { EntriesType, GameJamInfo, Posts } from './interface.ts';
-import { GetGameJams, GetPosts } from './lib.ts'; 
+import { GetGameJams, GetPosts } from './lib.js'; // keep as js because of vercel
 
 const PORT = 8000;
 const app = express();

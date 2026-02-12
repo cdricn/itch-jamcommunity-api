@@ -1,8 +1,8 @@
 import * as cheerio from 'cheerio';
 import axios from 'axios';
 import type { Posts, Entries, TagType } from './interface.ts';
-import { keywords } from './keywords.ts';
-import { defined_tags } from './definedTags.ts';
+import { keywords } from './keywords.js';
+import { defined_tags } from './definedTags.js';
 
 export async function GetGameJams(minMembers:number, link:string) {
   try {
