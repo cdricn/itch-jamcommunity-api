@@ -4,7 +4,9 @@
   "description": "itch gamejam community api",
   "main": "index.ts",
   "scripts": {
-    "start": "nodemon index.ts"
+    "dev": "nodemon index.ts", 
+    "build": "tsc",
+    "start": "node index.ts"
   },
   "author": "adrian cortezano",
   "license": "ISC",
