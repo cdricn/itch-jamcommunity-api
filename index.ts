@@ -1,31 +1,25 @@
 import express from 'express';
 import * as cheerio from 'cheerio';
 import axios from 'axios';
-import type { EntriesType, GameJamInfo, Posts } from './interface.ts';
+import type { Entries, EntriesType, GameJamInfo, Posts } from './interface.ts';
 import { GetGameJams, GetPosts } from './lib.js'; // keep as js because of vercel
 
 const PORT = 8000;
 const app = express();
 
-app.get('/gamejams/minMembers/:minMembers', async (req, res) => {
+app.get('/gamejams/upcoming/minMembers/:minMembers', async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   try {
     const minMembers = req.params.minMembers;
-    let entries : EntriesType = {upcoming:[], ongoing:[]};
-    let linkOngoing = 'https://itch.io/jams/in-progress/ranked/with-participants';
+    let entries : Entries[] = [];
     let linkUpcoming = 'https://itch.io/jams/upcoming/ranked/with-participants';
-    let entriesOngoing = await GetGameJams(Number(minMembers), linkOngoing);
-    if (entriesOngoing) {
-      entries.ongoing = entriesOngoing;
-    }
 
     let entriesUpcoming = await GetGameJams(Number(minMembers), linkUpcoming);
     if (entriesUpcoming) {
-      entries.upcoming = entriesUpcoming;
-      console.log('TEST', entriesUpcoming)
+      entries = entriesUpcoming;
     }
 
-    if (entries.ongoing.length > 0) {
+    if (entries.length > 0) {
       return res.json(entries);
     } else {
       res.status(404).send('Something went wrong while fetching data.');
@@ -33,6 +27,52 @@ app.get('/gamejams/minMembers/:minMembers', async (req, res) => {
   }
   catch (err) {
     console.log('Something happened while fettching game jam data. Req Param:', req.params.minMembers);
+    throw err;
+  }
+});
+
+app.get('/gamejams/ongoing/minMembers/:minMembers', async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  try {
+    const minMembers = req.params.minMembers;
+    let entries : Entries[] = [];
+    let linkOngoing = 'https://itch.io/jams/in-progress/ranked/with-participants';
+    let entriesOngoing = await GetGameJams(Number(minMembers), linkOngoing);
+    if (entriesOngoing) {
+      entries = entriesOngoing;
+    }
+
+    if (entries.length > 0) {
+      return res.json(entries);
+    } else {
+      res.status(404).send('Something went wrong while fetching data.');
+    }
+  }
+  catch (err) {
+    console.log('Something happened while fettching game jam data. Req Param:', req.params.minMembers);
+    throw err;
+  }
+});
+
+app.get('/gamejams/featured', async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  try {
+    let entries : Entries[] = [];
+    let linkUpcoming = 'https://itch.io/jams/upcoming/ranked/with-participants';
+
+    // let entriesUpcoming = await GetGameJams(Number(minMembers), linkUpcoming);
+    // if (entriesUpcoming) {
+    //   entries = entriesUpcoming;
+    // }
+
+    if (entries.length > 0) {
+      return res.json(entries);
+    } else {
+      res.status(404).send('Something went wrong while fetching data.');
+    }
+  }
+  catch (err) {
+    console.log('Something happened while fettching game jam data. Req Param:', req.params);
     throw err;
   }
 });
