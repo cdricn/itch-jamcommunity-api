@@ -83,8 +83,8 @@ function AddTags(fullTitle:string) {
   const definedTags : TagType = defined_tags;
   
   const titleArray = fullTitle.split(" ");
-  let tags : TagType = {};
-  console.log('==============Full Title==============', fullTitle)
+  let tags : TagType = {all: 'all'};
+  // console.log('==============Full Title==============', fullTitle)
   
   for (const i in titleArray) {
     let word = titleArray[i]!.toLowerCase();
@@ -96,12 +96,12 @@ function AddTags(fullTitle:string) {
     if (Object.hasOwn(definedTags, word)) {
       word = word.replace(/[^a-zA-Z0-9]/g, '');
 
-      // store and check to tell typescript it's not underfined
+      // store and check to tell typescript it's not undefined
       const mapped_tag = definedTags[word];
       if (mapped_tag) tags[mapped_tag] = mapped_tag;
     }
 
-    //if the word has a slash, we split again; ex: "musician/composer"
+    // if the word has a slash, we split again; ex: "musician/composer"
     else if (word.includes("/")) {
       let [firstWord, secondWord] = word.replace(/[^a-zA-Z0-9\/]/g, '').split("/");
       firstWord = firstWord ? definedTags[firstWord] : '';
@@ -115,5 +115,6 @@ function AddTags(fullTitle:string) {
       }
     }
   }
+
   return tags;
 }
