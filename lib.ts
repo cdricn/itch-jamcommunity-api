@@ -32,8 +32,7 @@ export async function GetGameJams(minMembers:number, link:string) {
   }
 }
 
-export function GetPosts($:cheerio.CheerioAPI) {
-  
+export function GetPosts($:cheerio.CheerioAPI, queryArray:Array<string>) {
   try {
     const entries : Posts[] = [];
     $('.topic_row').each((_, element) => {
@@ -44,10 +43,10 @@ export function GetPosts($:cheerio.CheerioAPI) {
       const replies = Number($element.find('.number_value').first().text().replace(/[^a-zA-Z0-9]/g, ''));
       const datePosted = $element.find('.topic_date').attr('title')!;
       const author = $element.find('.topic_author').text();
+      let tags = {};
 
       // put title into an array
       const titleArr = title.toLowerCase().split(' ');
-
       for (let i=0; i<titleArr.length; i++) {
         // put in variable before checking to avoid ts error
         const word = titleArr[i];
@@ -64,10 +63,16 @@ export function GetPosts($:cheerio.CheerioAPI) {
           const splitTwo = split[1] ? split[1] : '';
 
           if (Object.hasOwn(keywords, splitOne || splitTwo)) {
-            let tags = AddTags(title);
-            entries.push({title, url, content, replies, datePosted, author, tags});
+            tags = AddTags(title);
             break;
           } 
+        }
+      }
+
+      for (const i of queryArray) {
+        if (Object.hasOwn(tags, i)) {
+          entries.push({title, url, content, replies, datePosted, author, tags});
+          break;
         }
       }
     });
