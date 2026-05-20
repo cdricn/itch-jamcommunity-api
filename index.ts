@@ -119,6 +119,20 @@ app.get('/gamejam/posts/:link', async (req, res) => {
     let nextPageText = 'Next page';
     let nextPageLink = link;
     let entries : Posts[] = [];
+    
+    let queryTags = req.query.tags as string | string[] | undefined;
+    let queryArray : Array<string> = [];
+    if (queryTags !== undefined) {
+      if (typeof queryTags === 'string') {
+        queryArray.push(queryTags);
+      } 
+      else if (Array.isArray(queryTags)) {
+        queryArray = queryArray.concat(queryTags);
+      } 
+      else {
+        queryArray.push('all');
+      }
+    }
 
     while(nextPageText==='Next page') {
       let response = await axios.get(nextPageLink);
@@ -127,7 +141,7 @@ app.get('/gamejam/posts/:link', async (req, res) => {
       nextPageText = $('.category_pager').find('a').first().text();
       nextPageLink = 'https://itch.io' + $('.category_pager').find('a').attr('href');
       
-      let collectedEntries = GetPosts($);
+      let collectedEntries = GetPosts($, queryArray);
       if (collectedEntries) {
         entries = entries.concat(collectedEntries);
       };
